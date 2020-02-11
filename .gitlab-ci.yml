@@ -18,4 +18,4 @@ build:result:
     script:
         - cd result
         - docker build --pull -t $CONTAINER_REGISTRY/result-app:$VERSION .
-        - docker push $CONTAINER_REGISTRY/result-app:$VERSION
+        - docker push "$CONTAINER_REGISTRY/result-app:$VERSION"
