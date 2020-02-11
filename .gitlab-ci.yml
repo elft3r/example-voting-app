@@ -1,0 +1,21 @@
+services:
+    - docker:dind  
+
+variables:
+    - VERSION: "0.1.0"
+    - REGION: "us-east-1"
+
+stages:
+    - build
+    - deploy
+
+before_script:
+    - $(aws ecr get-login --no-include-email --region $REGION)
+      
+build:result:
+    stage: build
+    image: elft3r/docker-aws-cli
+    script:
+        - cd result
+        - docker build --pull -t $CONTAINER_REGISTRY/result-app:$VERSION .
+        - docker push $CONTAINER_REGISTRY/result-app:$VERSION
