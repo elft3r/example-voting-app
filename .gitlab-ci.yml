@@ -2,8 +2,8 @@ services:
     - docker:dind  
 
 variables:
-    - VERSION: "0.1.0"
-    - REGION: "us-east-1"
+    VERSION: "0.1.0"
+    REGION: "us-east-1"
 
 stages:
     - build
