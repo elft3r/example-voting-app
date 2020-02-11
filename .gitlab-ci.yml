@@ -17,5 +17,5 @@ build:result:
     image: elft3r/docker-aws-cli
     script:
         - cd result
-        - docker build --pull -t $CONTAINER_REGISTRY/result-app:$VERSION .
-        - docker push "$CONTAINER_REGISTRY/result-app:$VERSION"
+        - docker build --pull -t $CONTAINER_REGISTRY/voting-result-app:$VERSION .
+        - docker push "$CONTAINER_REGISTRY/voting-result-app:$VERSION"
