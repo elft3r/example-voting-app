@@ -16,8 +16,18 @@ namespace Worker
         {
             try
             {
-                var pgsql = OpenDbConnection("Server=db;Username=postgres;");
-                var redisConn = OpenRedisConnection("redis");
+                // Connect to postgres
+                var postgresHostname = System.Environment.GetEnvironmentVariable("POSTGRES_HOSTNAME");
+                if (string.IsNullOrEmpty(postgresHostname)) postgresHostname = "db";
+
+                var postgresConnStr = $"Server={postgresHostname};Username=postgres;";
+                var pgsql = OpenDbConnection(postgresConnStr);
+
+                // Connect to redis
+                var redisHostname = System.Environment.GetEnvironmentVariable("REDIS_HOSTNAME");
+                if (string.IsNullOrEmpty(redisHostname)) redisHostname = "redis";
+
+                var redisConn = OpenRedisConnection(redisHostname);
                 var redis = redisConn.GetDatabase();
 
                 // Keep alive is not implemented in Npgsql yet. This workaround was recommended:
@@ -32,9 +42,10 @@ namespace Worker
                     Thread.Sleep(100);
 
                     // Reconnect redis if down
-                    if (redisConn == null || !redisConn.IsConnected) {
+                    if (redisConn == null || !redisConn.IsConnected)
+                    {
                         Console.WriteLine("Reconnecting Redis");
-                        redisConn = OpenRedisConnection("redis");
+                        redisConn = OpenRedisConnection(redisHostname);
                         redis = redisConn.GetDatabase();
                     }
                     string json = redis.ListLeftPopAsync("votes").Result;
@@ -46,7 +57,7 @@ namespace Worker
                         if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
                         {
                             Console.WriteLine("Reconnecting DB");
-                            pgsql = OpenDbConnection("Server=db;Username=postgres;");
+                            pgsql = OpenDbConnection(postgresConnStr);
                         }
                         else
                         { // Normal +1 vote requested
