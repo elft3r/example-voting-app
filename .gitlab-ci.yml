@@ -1,37 +1,38 @@
 services:
-    - docker:dind
+  - docker:dind
 
 variables:
-    VERSION: "0.1.0"
-    REGION: "us-east-1"
+  VERSION: "0.1.0"
+  REGION: "us-east-1"
+  CONTAINER_REGISTRY: "068182984146.dkr.ecr.us-east-1.amazonaws.com"
 
 stages:
-    - build
-    - deploy
+  - build
+  - deploy
 
 before_script:
-    - $(aws ecr get-login --no-include-email --region $REGION)
-      
+  - $(aws ecr get-login --no-include-email --region $REGION)
+
 build:result:
-    stage: build
-    image: elft3r/docker-aws-cli
-    script:
-        - cd result
-        - docker build --pull -t $CONTAINER_REGISTRY/result-app:$VERSION .
-        - docker push "$CONTAINER_REGISTRY/result-app:$VERSION"
+  stage: build
+  image: elft3r/docker-aws-cli
+  script:
+    - cd result
+    - docker build --pull -t $CONTAINER_REGISTRY/result-app:$VERSION .
+    - docker push "$CONTAINER_REGISTRY/result-app:$VERSION"
 
 build:vote:
-    stage: build
-    image: elft3r/docker-aws-cli
-    script:
-        - cd vote
-        - docker build --pull -t $CONTAINER_REGISTRY/vote-app:$VERSION .
-        - docker push "$CONTAINER_REGISTRY/vote-app:$VERSION"
+  stage: build
+  image: elft3r/docker-aws-cli
+  script:
+    - cd vote
+    - docker build --pull -t $CONTAINER_REGISTRY/vote-app:$VERSION .
+    - docker push "$CONTAINER_REGISTRY/vote-app:$VERSION"
 
 build:worker:
-    stage: build
-    image: elft3r/docker-aws-cli
-    script:
-        - cd worker
-        - docker build --pull -t $CONTAINER_REGISTRY/worker-app:$VERSION .
-        - docker push "$CONTAINER_REGISTRY/worker-app:$VERSION"
+  stage: build
+  image: elft3r/docker-aws-cli
+  script:
+    - cd worker
+    - docker build --pull -t $CONTAINER_REGISTRY/worker-app:$VERSION .
+    - docker push "$CONTAINER_REGISTRY/worker-app:$VERSION"
