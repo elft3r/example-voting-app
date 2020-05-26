@@ -13,6 +13,7 @@ var express = require('express'),
 io.set('transports', ['polling']);
 
 var port = process.env.PORT || 4000;
+var postgresHostname = process.env.POSTGRES_HOSTNAME || "db";
 
 io.sockets.on('connection', function (socket) {
 
@@ -24,7 +25,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 var pool = new pg.Pool({
-  connectionString: 'postgres://postgres@db/postgres'
+  connectionString: 'postgres://postgres@' + postgresHostname + '/postgres'
 });
 
 async.retry(
@@ -32,7 +33,7 @@ async.retry(
   function(callback) {
     pool.connect(function(err, client, done) {
       if (err) {
-        console.error("Waiting for db");
+        console.error("Waiting for db at: " + postgresHostname);
       }
       callback(err, client);
     });
@@ -41,7 +42,7 @@ async.retry(
     if (err) {
       return console.error("Giving up");
     }
-    console.log("Connected to db");
+    console.log("Connected to db at: " + postgresHostname);
     getVotes(client);
   }
 );
